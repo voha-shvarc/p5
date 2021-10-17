@@ -19,9 +19,7 @@ const Slider = {
     },
     buildSlider: function () {
         let sliderHTML = "";
-        let sliderIndexesHTML = "";
         for (let slide of this.slides) {
-            //зверніть увагу на можливість використання ``,яка дозволяє додавати в string змінні ${}
             sliderHTML +=
                 `<div id='${slide.id}' class='singleSlide'
             style='background-image:url(${slide.background});'>
@@ -29,14 +27,24 @@ const Slider = {
             <h2>${slide.title}</h2>
             <a class='link' href='${slide.link}' target='_blank'>Open</a></div></div>`;
         }
-        for(let i = 0; i < this.slides.length; i++) {
-           
+        for (let i = 0; i < this.slides.length; i++) {
+            let btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.id = 'button-' + this.id;
+            btn.innerHTML = i;
+            document.querySelector(".slider-indexes").appendChild(btn);
+            btn.addEventListener("click", (event) => {
+                index = Number(event.target.innerHTML);
+                while (this.current !== index) {
+                    this.nextSlide();
+                };
+            });
         }
         document.getElementById("slider").innerHTML = sliderHTML;
-        document.querySelector(".slider-indexes").innerHTML = sliderIndexesHTML;
         document.getElementById("slide-" + this.current).style.left = 0;
     },
     prevSlide: function () {
+        console.log("I'm not running");
         let next;
         if (this.current === 0) {
             next = this.slides.length - 1;
@@ -53,6 +61,7 @@ const Slider = {
         this.current = next;
     },
     nextSlide: function () {
+        console.log("I'm running");
         let next;
         if (this.current === (this.slides.length - 1)) {
             next = 0;
@@ -94,18 +103,18 @@ showBtn.addEventListener('click', () => {
 
 const toggle = document.querySelector(".slideshow");
 
-toggle.addEventListener('click', (event)=>{
-    if (event.target.classList.contains('start')){
+toggle.addEventListener('click', (event) => {
+    if (event.target.classList.contains('start')) {
         event.target.innerHTML = 'Stoped';
         clearInterval(interval)
     } else {
         event.target.innerHTML = 'In progress';
-        interval = setInterval(()=>{
+        interval = setInterval(() => {
             Slider.nextSlide();
-        },1000)
+        }, 1000)
     }
     event.target.classList.toggle('start')
- })
- function moveTo (index) {
+})
+function moveTo(index) {
     Slider.current = index;
 }
