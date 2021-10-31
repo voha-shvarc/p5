@@ -14,11 +14,13 @@ function canvas(selector, options) {
   let points = [] //масив з точками
 
   // об’являємо функцію додавання точок в масив
-  const addPoint = (x, y, dragging) => {
+  const addPoint = (x, y, strokeWidth, strokeColor, dragging) => {
     // преобразуємо координати події кліка миші відносно canvas
     points.push({
       x: (x - rect.left),
       y: (y - rect.top),
+      strokeWidth: strokeWidth,
+      strokeColor: strokeColor,
       dragging: dragging
     })
   }
@@ -27,13 +29,13 @@ function canvas(selector, options) {
   const redraw = () => {
     //очищуємо  canvas
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-    context.strokeStyle = options.strokeColor;
+    
     context.lineJoin = "round";
-    context.lineWidth = options.strokeWidth;
     let prevPoint = null;
     // console.log(points);
     for (let point of points) {
+      context.strokeStyle = point.strokeColor;
+      context.lineWidth = point.strokeWidth;
       context.beginPath();
       if (point.dragging && prevPoint) {
         context.moveTo(prevPoint.x, prevPoint.y)
@@ -50,13 +52,13 @@ function canvas(selector, options) {
   // функції обробники подій миші
   const mouseDown = event => {
     isPaint = true
-    addPoint(event.pageX, event.pageY);
+    addPoint(event.pageX, event.pageY, options.strokeWidth, options.strokeColor);
     redraw();
   }
 
   const mouseMove = event => {
     if (isPaint) {
-      addPoint(event.pageX, event.pageY, true);
+      addPoint(event.pageX, event.pageY, options.strokeWidth, options.strokeColor, true);
       redraw();
     }
   }
@@ -127,7 +129,6 @@ function canvas(selector, options) {
   restoreBtn.addEventListener('click', () => {
     let stringified_points = localStorage.getItem('points');
     points = JSON.parse(stringified_points);
-    console.log(points);
     isPaint= true;
     redraw();
     isPaint = false;
